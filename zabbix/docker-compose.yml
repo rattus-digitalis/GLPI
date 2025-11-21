@@ -1,0 +1,67 @@
+services:
+
+  zabbix_db:
+    image: mariadb:10.6
+    container_name: zabbix_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: ${TZ}
+    command:
+      - --character-set-server=utf8
+      - --collation-server=utf8_bin
+      - --skip-character-set-client-handshake
+    volumes:
+      - zbx_db:/var/lib/mysql
+    networks:
+      - zabbix
+
+  zabbix_server:
+    image: zabbix/zabbix-server-mysql:latest
+    container_name: zabbix_server
+    restart: unless-stopped
+    depends_on:
+      - zabbix_db
+    environment:
+      DB_SERVER_HOST: zabbix_db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: ${TZ}
+    networks:
+      - zabbix
+
+  zabbix_web:
+    image: zabbix/zabbix-web-nginx-mysql:latest
+    container_name: zabbix_web
+    restart: unless-stopped
+    depends_on:
+      - zabbix_server
+    environment:
+      DB_SERVER_HOST: zabbix_db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      ZBX_SERVER_HOST: zabbix_server
+      PHP_TZ: ${TZ}
+    networks:
+      - zabbix
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.zabbix.rule=Host(`zabbix.localhost`)"
+      - "traefik.http.routers.zabbix.entrypoints=websecure"
+      - "traefik.http.routers.zabbix.tls.certresolver=selfsigned"
+      - "traefik.http.services.zabbix.loadbalancer.server.port=8080"
+
+networks:
+  zabbix:
+  traefik:
+    external: true
+
+volumes:
+  zbx_db:
+

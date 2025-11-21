@@ -1,0 +1,49 @@
+# environnements
+.env
+*/.env
+
+# traefik
+GLPI/traefik/acme.json
+
+# docker
+**/zbx_db/**
+**/db_data/**
+**/glpi_app/**
+**/glpi_db/**
+**/volumes/**
+
+# python cache
+**/__pycache__/
+
+# backup or temp
+*.bak
+*.tmp
+
+# logs
+*.log
+**/logs/
+
+# environnements
+.env
+*/.env
+
+# traefik
+GLPI/traefik/acme.json
+
+# docker
+**/zbx_db/**
+**/db_data/**
+**/glpi_app/**
+**/glpi_db/**
+**/volumes/**
+
+# python cache
+**/__pycache__/
+
+# backup or temp
+*.bak
+*.tmp
+
+# logs
+*.log
+**/logs/
