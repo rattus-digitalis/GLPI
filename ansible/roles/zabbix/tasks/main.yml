@@ -1,0 +1,10 @@
+---
+- name: Deploy Zabbix docker-compose
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/zabbix/docker-compose.yml
+
+- name: Ensure Zabbix stack is running
+  command: docker compose up -d
+  args:
+    chdir: /opt/zabbix

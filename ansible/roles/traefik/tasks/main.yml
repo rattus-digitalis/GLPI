@@ -1,0 +1,50 @@
+---
+- name: Ensure Traefik directory exists
+  file:
+    path: /opt/traefik
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Deploy Traefik dynamic config
+  copy:
+    src: acme.json
+    dest: /opt/traefik/acme.json
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Deploy Traefik static config
+  template:
+    src: traefik.yml.j2
+    dest: /opt/traefik/traefik.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy Traefik docker-compose
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/traefik/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+# --- AJOUT NOUVEAU POUR ÉVITER LE CONFLIT TRAEFIK DÉJÀ EN COURS ---
+
+- name: Stop old Traefik container if exists
+  command: docker stop traefik
+  ignore_errors: true
+
+- name: Remove old Traefik container if exists
+  command: docker rm traefik
+  ignore_errors: true
+
+# -----------------------------------------------------------------
+
+- name: Start Traefik stack
+  command: docker compose up -d
+  args:
+    chdir: /opt/traefik
+

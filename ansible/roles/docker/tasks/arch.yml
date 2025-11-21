@@ -1,0 +1,12 @@
+---
+- name: Update pacman cache
+  pacman:
+    update_cache: true
+
+- name: Install Docker & Compose
+  pacman:
+    name:
+      - docker
+      - docker-compose
+    state: present
+

@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  zabbix_db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: "{{ zabbix_db_name }}"
+      MYSQL_USER: "{{ zabbix_db_user }}"
+      MYSQL_PASSWORD: "{{ zabbix_db_pass }}"
+      MYSQL_ROOT_PASSWORD: "{{ zabbix_db_pass }}"
+    volumes:
+      - zbx_db:/var/lib/mysql
+
+  zabbix_server:
+    image: zabbix/zabbix-server-mysql:latest
+    environment:
+      DB_SERVER_HOST: zabbix_db
+      MYSQL_DATABASE: "{{ zabbix_db_name }}"
+      MYSQL_USER: "{{ zabbix_db_user }}"
+      MYSQL_PASSWORD: "{{ zabbix_db_pass }}"
+    depends_on:
+      - zabbix_db
+
+  zabbix_web:
+    image: zabbix/zabbix-web-nginx-mysql:latest
+    ports:
+      - "8081:8080"
+    environment:
+      DB_SERVER_HOST: zabbix_db
+      MYSQL_DATABASE: "{{ zabbix_db_name }}"
+      MYSQL_USER: "{{ zabbix_db_user }}"
+      MYSQL_PASSWORD: "{{ zabbix_db_pass }}"
+    depends_on:
+      - zabbix_server
+      - zabbix_db
+
+volumes:
+  zbx_db:

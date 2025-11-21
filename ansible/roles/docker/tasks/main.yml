@@ -1,0 +1,29 @@
+---
+- name: Include Debian tasks
+  include_tasks: debian.yml
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Include Arch tasks
+  include_tasks: arch.yml
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: Ensure /etc/docker exists
+  file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+
+- name: Deploy Docker daemon config
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  notify:
+    - restart docker
+
+- name: Enable & start Docker
+  systemd:
+    name: docker
+    enabled: true
+    state: started
+

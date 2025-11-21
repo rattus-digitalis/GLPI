@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: "{{ glpi_db_root }}"
+      MYSQL_DATABASE: "{{ glpi_db_name }}"
+      MYSQL_USER: "{{ glpi_db_user }}"
+      MYSQL_PASSWORD: "{{ glpi_db_pass }}"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  glpi:
+    image: diouxx/glpi:latest
+    ports:
+      - "{{ glpi_port }}:80"
+    volumes:
+      - glpi_app:/var/www/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.glpi.rule=Host(\`glpi.localhost\`)"
+      - "traefik.http.routers.glpi.entrypoints=websecure"
+      - "traefik.http.routers.glpi.tls.certresolver=selfsigned"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+  glpi_app:
