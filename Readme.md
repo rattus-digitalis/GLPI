@@ -25,43 +25,6 @@ Ce projet fournit une stack IT totalement automatisée, reproductible et product
 ✔ Séparation propre des rôles Ansible
 ✔ Variables centralisées dans group_vars/
 
-🏗️ Architecture
-┌──────────────────────────┐
-│        Traefik v3        │
-│ glpi.localhost           │
-│ zabbix.localhost         │
-└─────────────┬────────────┘
-              │
-     ┌────────┴───────────┐
-     │                    │
-┌────▼───────┐      ┌─────▼──────┐
-│   GLPI     │      │   Zabbix   │
-│  MariaDB   │      │   MySQL    │
-└────────────┘      └────────────┘
-
-📁 Arborescence du projet
-ansible/
-│
-├── ansible.cfg
-├── inventory/
-│   ├── hosts.ini
-│   └── group_vars/
-│       ├── all.yml
-│       ├── glpi.yml
-│       └── zabbix.yml
-│
-├── playbooks/
-│   ├── full_deploy.yml
-│   ├── install_glpi.yml
-│   ├── install_zabbix.yml
-│   └── install_traefik.yml
-│
-└── roles/
-    ├── docker/
-    ├── traefik/
-    ├── glpi/
-    └── zabbix/
-
 🌍 Prérequis
 Systèmes compatibles
 
