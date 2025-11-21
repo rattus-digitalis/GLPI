@@ -13,13 +13,11 @@ services:
 
   glpi:
     image: diouxx/glpi:latest
-    ports:
-      - "{{ glpi_port }}:80"
     volumes:
       - glpi_app:/var/www/html
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.glpi.rule=Host(\`glpi.localhost\`)"
+      - "traefik.http.routers.glpi.rule=Host(`glpi.localhost`)"
       - "traefik.http.routers.glpi.entrypoints=websecure"
       - "traefik.http.routers.glpi.tls.certresolver=selfsigned"
     depends_on:
@@ -28,3 +26,4 @@ services:
 volumes:
   db_data:
   glpi_app:
+

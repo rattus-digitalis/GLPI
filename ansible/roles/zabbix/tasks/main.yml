@@ -1,10 +1,22 @@
 ---
+# 1. Créer le dossier Zabbix
+- name: Ensure Zabbix directory exists
+  file:
+    path: /opt/zabbix
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+# 2. Déployer le docker-compose Zabbix
 - name: Deploy Zabbix docker-compose
   template:
     src: docker-compose.yml.j2
     dest: /opt/zabbix/docker-compose.yml
 
+# 3. Lancer la stack Zabbix
 - name: Ensure Zabbix stack is running
   command: docker compose up -d
   args:
     chdir: /opt/zabbix
+

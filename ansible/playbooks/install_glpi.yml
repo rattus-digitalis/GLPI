@@ -1,5 +1,12 @@
 - hosts: local
   become: true
+
+  vars_files:
+    - ../inventory/group_vars/glpi_secrets.yml
+
   roles:
     - docker
+    - traefik
     - glpi
+    - zabbix
+

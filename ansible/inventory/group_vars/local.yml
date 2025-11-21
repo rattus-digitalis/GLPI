@@ -1,0 +1,62 @@
+# ============================================================
+#  VARIABLES GENERALES (LOCALHOST)
+# ============================================================
+
+ansible_connection: local
+ansible_python_interpreter: /usr/bin/python3
+
+
+# ============================================================
+#  DOCKER / TRAEFIK
+# ============================================================
+
+traefik_domain: "traefik.localhost"
+traefik_email: "admin@example.com"
+traefik_http_port: 80
+traefik_https_port: 443
+traefik_dashboard_port: 8080
+
+
+# ============================================================
+#  GLPI
+# ============================================================
+
+# Port exposé par le service GLPI (doit éviter conflit avec Traefik)
+glpi_port: 8081
+glpi_domain: "glpi.localhost"
+
+# Variables de configuration de la base GLPI (Vault)
+glpi_db_name: "{{ vault_glpi_db_name }}"
+glpi_db_user: "{{ vault_glpi_db_user }}"
+glpi_db_pass: "{{ vault_glpi_db_pass }}"
+glpi_db_root: "{{ vault_glpi_db_root }}"
+
+
+# ============================================================
+#  ZABBIX
+# ============================================================
+
+zabbix_domain: "zabbix.localhost"
+zabbix_app_port: 8082  # pour éviter collision avec GLPI
+
+# Variables DB Zabbix (Vault)
+zabbix_db_name: "{{ vault_zabbix_db_name }}"
+zabbix_db_user: "{{ vault_zabbix_db_user }}"
+zabbix_db_pass: "{{ vault_zabbix_db_pass }}"
+zabbix_db_root: "{{ vault_zabbix_db_root }}"
+
+
+# ============================================================
+#  VAULT VARIABLES (définies dans group_vars/glpi_secrets.yml)
+# ============================================================
+
+# Exemples :
+# vault_glpi_db_name: "glpidb"
+# vault_glpi_db_user: "glpiuser"
+# vault_glpi_db_pass: "glpipwd"
+# vault_glpi_db_root: "rootpwd"
+# vault_zabbix_db_name: "zabbixdb"
+# vault_zabbix_db_user: "zabbixuser"
+# vault_zabbix_db_pass: "zabbixpwd"
+# vault_zabbix_db_root: "rootpwd"
+

@@ -1,10 +1,22 @@
 ---
+# 1. Créer le dossier GLPI
+- name: Ensure GLPI directory exists
+  file:
+    path: /opt/glpi
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+# 2. Déployer le docker-compose GLPI
 - name: Deploy GLPI docker-compose
   template:
     src: docker-compose.yml.j2
     dest: /opt/glpi/docker-compose.yml
 
+# 3. Lancer les conteneurs GLPI
 - name: Ensure GLPI stack is running
   command: docker compose up -d
   args:
     chdir: /opt/glpi
+

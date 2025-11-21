@@ -1,6 +1,0 @@
----
-glpi_db_root: rootpassword
-glpi_db_name: glpidb
-glpi_db_user: glpiuser
-glpi_db_pass: glpipassword
-glpi_port: 666

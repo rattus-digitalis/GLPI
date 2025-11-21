@@ -1,0 +1,10 @@
+vault_glpi_db_name: "glpidb"
+vault_glpi_db_user: "glpiuser"
+vault_glpi_db_pass: "superpassword"
+vault_glpi_db_root: "rootpassword"
+
+vault_zabbix_db_name: "zabbixdb"
+vault_zabbix_db_user: "zabbix"
+vault_zabbix_db_pass: "secret"
+vault_zabbix_db_root: "rootsecret"
+
