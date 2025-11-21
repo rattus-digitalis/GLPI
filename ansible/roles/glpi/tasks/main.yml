@@ -1,22 +1,25 @@
 ---
-# 1. Créer le dossier GLPI
-- name: Ensure GLPI directory exists
-  file:
-    path: /opt/glpi
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
-# 2. Déployer le docker-compose GLPI
-- name: Deploy GLPI docker-compose
+- name: Render GLPI docker-compose file
   template:
     src: docker-compose.yml.j2
-    dest: /opt/glpi/docker-compose.yml
+    dest: "{{ role_path }}/templates/docker-compose.yml"
 
-# 3. Lancer les conteneurs GLPI
-- name: Ensure GLPI stack is running
-  command: docker compose up -d
-  args:
-    chdir: /opt/glpi
+- name: Deploy GLPI stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ role_path }}/templates"
+
+- name: Wait for DB to be ready
+  shell: "docker exec glpi_db mysql -u root -p{{ glpi_db_root }} -e 'SELECT 1;'"
+  register: db_ready
+  retries: 10
+  delay: 5
+  until: db_ready.rc == 0
+
+- name: Fix GLPI plugin permissions
+  shell: "docker exec glpi_app chown -R www-data:www-data /var/www/html/plugins"
+
+- name: Activate Inventory plugin
+  shell: >
+    docker exec glpi_db mysql -u root -p{{ glpi_db_root }} {{ glpi_db_name }}
+    -e "UPDATE glpi_plugins SET state = 1 WHERE directory='inventory';"
 
