@@ -1,50 +1,45 @@
-📘 README complet pour ton projet
+📘 GLPI + Zabbix – Infrastructure Docker automatisée avec Ansible
 
-Tu peux coller ça directement dans un fichier README.md à la racine du repo.
-
-GLPI + Zabbix – Infrastructure Docker automatisée avec Ansible
-
-Infrastructure complète incluant :
+Infrastructure complète comprenant :
 
 Traefik v3 (reverse proxy & TLS)
 
-GLPI (ITSM)
+GLPI (ITSM / Helpdesk)
 
-Zabbix (monitoring)
+Zabbix Server (monitoring)
 
 Docker + Docker Compose
 
-Ansible (installation & orchestration automatique)
+Ansible pour l'installation, le déploiement et l'orchestration
 
-Ce projet sert à déployer automatiquement une stack IT complète sur une machine (Debian, Ubuntu, Arch Linux…).
+Ce projet fournit une stack IT totalement automatisée, reproductible et production-ready, idéale pour un lab ou une petite infra.
 
 🚀 Fonctionnalités
 
-✔ Reverse-proxy Traefik avec HTTPS
-✔ GLPI entièrement fonctionnel + configuration DB + templates
-✔ Zabbix Server + Web UI + Base de données
-✔ Playbooks Ansible pour déploiement automatique
-✔ Automated Docker installation (Arch & Debian support)
-✔ Idempotence complète : rejouer les playbooks n’est jamais destructif
-✔ Structure professionnelle des rôles Ansible
-✔ Découpage clair : docker / traefik / glpi / zabbix
-✔ Compatible environnement production ou lab
+✔ Reverse-proxy avec HTTPS (Traefik v3)
+✔ GLPI fonctionnel avec DB et configuration
+✔ Zabbix Server + Web UI
+✔ Playbooks Ansible : déploiement automatisé complet
+✔ Support Arch Linux & Debian/Ubuntu
+✔ Configuration idempotente
+✔ Séparation propre des rôles Ansible
+✔ Variables centralisées dans group_vars/
 
-🏗️ Architecture technique
+🏗️ Architecture
 ┌──────────────────────────┐
-│        Traefik v3        │  ← TLS, routing, proxy
-│  glpi.localhost          │
-│  zabbix.localhost        │
+│        Traefik v3        │
+│ glpi.localhost           │
+│ zabbix.localhost         │
 └─────────────┬────────────┘
               │
      ┌────────┴───────────┐
      │                    │
 ┌────▼───────┐      ┌─────▼──────┐
 │   GLPI     │      │   Zabbix   │
-│  + MariaDB │      │  + MySQL   │
+│  MariaDB   │      │   MySQL    │
 └────────────┘      └────────────┘
 
-📁 Structure du dépôt
+📁 Arborescence du projet
 ansible/
 │
 ├── ansible.cfg
@@ -56,10 +51,10 @@ ansible/
 │       └── zabbix.yml
 │
 ├── playbooks/
+│   ├── full_deploy.yml
 │   ├── install_glpi.yml
 │   ├── install_zabbix.yml
-│   ├── install_traefik.yml
-│   └── full_deploy.yml
+│   └── install_traefik.yml
 │
 └── roles/
     ├── docker/
@@ -68,28 +63,23 @@ ansible/
     └── zabbix/
 
 🌍 Prérequis
-Système compatible :
+Systèmes compatibles
 
 Arch Linux ✔
 
 Debian / Ubuntu ✔
-
-Toutes distributions gérées par Ansible ✔
 
 Paquets requis
 sudo pacman -S ansible
 # ou
 sudo apt install ansible
 
-Ports ouverts :
-
-80 / 443 (Traefik)
-
-3306 (DB internes)
-
-10051 (Zabbix server)
-
-⚙️ Configuration de l’inventaire
+Ports requis
+Service	Ports
+Traefik	80 / 443 / 8080
+Zabbix Server	10051
+Bases de données	3306 (interne Docker)
+⚙️ Configuration Ansible
 inventory/hosts.ini
 [local]
 127.0.0.1 ansible_connection=local ansible_become=true
@@ -110,21 +100,21 @@ zabbix_domain: "zabbix.localhost"
 zabbix_db_name: "zabbix"
 zabbix_db_password: "zabbixpwd"
 
-▶️ Déploiement pas à pas
-1️⃣ Installer Traefik
-ansible-playbook playbooks/install_traefik.yml
+▶️ Déploiement des services
+1️⃣ Installer Docker + Traefik
+ansible-playbook ansible/playbooks/install_traefik.yml
 
 2️⃣ Installer GLPI
-ansible-playbook playbooks/install_glpi.yml
+ansible-playbook ansible/playbooks/install_glpi.yml
 
 3️⃣ Installer Zabbix
-ansible-playbook playbooks/install_zabbix.yml
+ansible-playbook ansible/playbooks/install_zabbix.yml
 
 🚀 Déploiement complet automatique
 
-💥 La commande ultime :
+💥 Tout installer en une seule commande :
 
-ansible-playbook playbooks/full_deploy.yml
+ansible-playbook ansible/playbooks/full_deploy.yml
 
 
 Ce playbook :
@@ -138,43 +128,42 @@ Déploie Traefik
 Déploie GLPI
 
 Déploie Zabbix
-→ Sans intervention manuelle
 
-🌐 Accès aux services
+Aucune intervention manuelle.
+
+🌐 Accès aux services Web
 Service	URL
-Traefik dashboard	http://localhost:8080
+Traefik Dashboard	http://localhost:8080
 
 GLPI	https://glpi.localhost
 
 Zabbix	https://zabbix.localhost
+
+⚠️ Les certificats ACME sont auto-signés (staging).
+
 🛠️ Commandes utiles
 Vérifier les conteneurs
 docker ps
 
-Redémarrer toute la stack Traefik
+Redémarrer Traefik
 cd /opt/traefik
-docker compose down
-docker compose up -d
+docker compose down && docker compose up -d
 
-Rejouer Ansible sans changement
+Mode dry-run (simuler sans exécuter)
 ansible-playbook playbooks/install_glpi.yml --check
 
 🔐 Sécurité
 
-Les dossiers /opt/glpi et /opt/zabbix doivent être root-only
+acme.json possède les permissions correctes (0600)
 
-Le fichier acme.json est en 600 (correct)
+Tout le stack est isolé dans /opt/<service>
 
-Les règles Traefik peuvent être renforcées (headers, middlewares)
+Les conteneurs ne sont jamais exposés directement (Traefik only)
 
-Prévoir un backup régulier des volumes Docker
+Pour un environnement prod :
 
-Je peux ajouter une section Sécurité avancée si tu veux :
+Utiliser Let's Encrypt production
 
-Fail2ban
+Ajouter middlewares Traefik (security headers, rate-limits)
 
-Headers Traefik security
-
-Audit GLPI automatisé
-
-Monitoring auto des conteneurs via Zabbix alerts
+Ajouter une sauvegarde automatique des volumes (Restic/Borg)
